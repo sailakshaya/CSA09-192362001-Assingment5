@@ -1,0 +1,23 @@
+// Core migration logic (simplified)
+int loaded = 0;
+List<String> errors = new ArrayList<>();
+List<String[]> batch = new ArrayList<>();
+
+try (BufferedReader br = Files.newBufferedReader(Path.of("passes.csv"))) {
+    String line;
+    int lineNo = 0;
+    while ((line = br.readLine()) != null) {
+        lineNo++;
+        String[] f = line.split(",", -1);
+        try {
+            if (f.length != 5 || f[0].isBlank() || f[1].isBlank()
+                    || f[2].isBlank()) throw new IllegalArgumentException("Bad fields");
+            Integer.parseInt(f[3]);
+            double amount = Double.parseDouble(f[4]);
+            if (amount < 0) throw new IllegalArgumentException("Negative amount");
+            batch.add(f);
+        } catch (RuntimeException ex) {
+            errors.add("Line " + lineNo + ": " + ex.getMessage());
+        }
+    }
+}
