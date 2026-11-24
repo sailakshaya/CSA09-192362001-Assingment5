@@ -1,0 +1,15 @@
+// UNSAFE: do not use in a real application
+String unsafeSql = "SELECT * FROM users WHERE id='" + id
+                 + "' AND pwd='" + pwd + "'";
+Statement st = con.createStatement();
+ResultSet unsafeRs = st.executeQuery(unsafeSql);
+
+// SAFE
+String safeSql = "SELECT * FROM users WHERE id=? AND pwd_hash=?";
+try (PreparedStatement ps = con.prepareStatement(safeSql)) {
+    ps.setString(1, id);
+    ps.setString(2, suppliedPasswordHash);
+    try (ResultSet rs = ps.executeQuery()) {
+        System.out.println(rs.next() ? "Login accepted" : "Login rejected");
+    }
+}
