@@ -1,0 +1,10 @@
+Redesign Using Buffering
+try (BufferedInputStream in =
+         new BufferedInputStream(new FileInputStream("attendance.log"))) {
+    int b;
+    long lines = 0;
+    while ((b = in.read()) != -1) {
+        if (b == '\\n') lines++;
+    }
+    System.out.println("Lines: " + lines);
+}
