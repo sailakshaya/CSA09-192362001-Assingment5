@@ -1,0 +1,43 @@
+Pseudocode: Add a pass
+ALGORITHM AddPass(pass)
+INPUT: A validated bus-pass record
+BEGIN
+    Open the file using BufferedWriter in APPEND mode
+    Convert each field to the agreed escaped delimited representation
+    Write the fields as one line
+    Write a newline
+    Flush and close the writer
+END
+Pseudocode: Find by pass ID
+ALGORITHM FindPass(passId)
+INPUT: passId
+OUTPUT: Matching record or NOT_FOUND
+BEGIN
+    IF the file does not exist THEN RETURN NOT_FOUND
+    Open BufferedReader
+    WHILE a line can be read
+        Split the line using the escape-aware delimiter parser
+        IF field count is not 7 THEN continue
+        IF fields are invalid THEN continue
+        IF fields[0] equals passId THEN
+            Close reader
+            RETURN the parsed record
+        ENDIF
+    ENDWHILE
+    Close reader
+    RETURN NOT_FOUND
+END
+Pseudocode: List passes on a route
+ALGORITHM ListByRoute(route)
+INPUT: route number
+OUTPUT: All valid records whose route number equals route
+BEGIN
+    Open BufferedReader
+    WHILE a line can be read
+        Parse and validate the line
+        IF valid AND routeNumber equals route THEN
+            Display the record
+        ENDIF
+    ENDWHILE
+    Close reader
+END
