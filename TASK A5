@@ -1,0 +1,21 @@
+Transaction Design
+ALGORITHM Transfer500(sourceWallet, targetWallet)
+BEGIN
+    Obtain JDBC connection
+    Save original autoCommit value
+    Set autoCommit = false
+    TRY
+        UPDATE wallet SET balance = balance - 500
+            WHERE wallet_id = sourceWallet AND balance >= 500
+        IF affected rows != 1 THEN RAISE error
+        UPDATE wallet SET balance = balance + 500
+            WHERE wallet_id = targetWallet
+        IF affected rows != 1 THEN RAISE error
+        COMMIT
+    CATCH error
+        ROLLBACK
+        RAISE error
+    FINALLY
+        Restore original autoCommit
+        Close resources
+END
