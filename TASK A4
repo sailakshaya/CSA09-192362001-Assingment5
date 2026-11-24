@@ -1,0 +1,15 @@
+Decide What to Persist
+•	Mark Resident.password transient, because a password should not be stored in a plain serialized object file. Store a securely salted password hash in a protected credential store instead.
+•	Mark the live database Connection transient. A connection is a runtime resource and cannot meaningfully be restored by serialization.
+•	The name, register number and other required resident data, Room objects and Hostel data can be serialized if they implement Serializable and are appropriate to persist.
+Serialization follows the reachable object graph from Hostel. It serializes the Hostel object and referenced serializable Room objects and Resident objects, preserving object references and shared-reference relationships. A non-transient, non-serializable reachable object causes NotSerializableException.
+A4.2 – Plan for Change
+When phoneNumber is added, an older serialized file does not contain a value for that field. If the class has a compatible explicit serialVersionUID, deserialization can succeed and the new field receives its Java default value (null for String). If the serialVersionUID differs, InvalidClassException is normally thrown. Define serialVersionUID explicitly and implement migration/defaulting logic.
+Alternative Concept and Complexity Analysis
+CSV/JSON is language-independent, human-readable and easier to evolve with optional fields, but it requires explicit parsing and mapping. Java serialization is convenient for object graphs but is Java-specific and sensitive to class-version changes. For n residents, both approaches require O(n) time to save and load. File size depends on field values and serialization metadata; CSV/JSON may be larger due to textual formatting, while binary serialization may be compact but is not guaranteed to be smaller. Adding a field to JSON can be handled with a default when absent; CSV needs a versioned/header-aware parser.
+Feature	Java serialization	CSV/JSON
+Format	Binary, Java-specific	Text, widely portable
+Object graph	Preserves references	Must map relationships explicitly
+Schema evolution	serialVersionUID and compatibility rules	Optional fields/versioned parsing
+Save/load time	O(n)	O(n)
+Security	Do not deserialize untrusted data	Validate parsed input
